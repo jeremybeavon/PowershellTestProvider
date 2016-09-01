@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>PowershellTestProvider</id>
+        <version>0.1.0-pre</version>
+        <authors>Jeremy Beavon</authors>
+        <projectUrl>https://github.com/jeremybeavon/PowershellTestProvider</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provides a Powershell provider intended for testing scripts that access the file system</description>
+        <summary />
+    </metadata>
+    <files>
+        <file src="PowershellTestProvider\bin\Release\PowershellTestProvider.dll" target="PowershellTestProvider.dll" />
+        <file src="PowershellTestProviderModule\PowershellTestProviderModule.psd1" target="PowershellTestProviderModule.psd1" />
+    </files>
+</package>

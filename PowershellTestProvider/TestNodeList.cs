@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Management.Automation;
 
 namespace PowershellTestProvider
 {
@@ -24,7 +26,26 @@ namespace PowershellTestProvider
 
         public TestNode this[string name]
         {
-            get { return Enumerable.FirstOrDefault(this, node => node.Name == name); }
+            get
+            {
+                if (string.IsNullOrWhiteSpace(name) || name == ".")
+                {
+                    return parentNode;
+                }
+
+                if (name == "..")
+                {
+                    return parentNode.ParentNode ?? parentNode;
+                }
+
+                if (name.Contains("*"))
+                {
+                    WildcardPattern pattern = new WildcardPattern(name, WildcardOptions.IgnoreCase);
+                    return Enumerable.FirstOrDefault(this, node => pattern.IsMatch(node.Name));
+                }
+
+                return Enumerable.FirstOrDefault(this, node => string.Equals(node.Name, name, StringComparison.OrdinalIgnoreCase));
+            }
         }
 
         protected override void ClearItems()

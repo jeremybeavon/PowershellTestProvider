@@ -1,6 +1,9 @@
 ﻿using Microsoft.PowerShell.Commands;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Provider;
@@ -8,13 +11,31 @@ using System.Text.RegularExpressions;
 
 namespace PowershellTestProvider
 {
-    [CmdletProvider("Test", ProviderCapabilities.None)]
+    [CmdletProvider("Test", ProviderCapabilities.Filter | ProviderCapabilities.Exclude | ProviderCapabilities.Include)]
     public sealed class TestProvider : NavigationCmdletProvider, IContentCmdletProvider
     {
         private static readonly TestNode rootNode = new TestNode(null);
-        
+
+        public static void AddTestFiles(IEnumerable files)
+        {
+            AddTestFiles(files, rootNode);
+        }
+
+        public static void RemoveAllTestFiles()
+        {
+            if (rootNode.ChildNodes != null)
+            {
+                rootNode.ChildNodes.Clear();
+            }
+        }
+
         public void ClearContent(string path)
         {
+            TestNode node = GetNode(path);
+            if (node != null)
+            {
+                node.Content = string.Empty;
+            }
         }
 
         public object ClearContentDynamicParameters(string path)
@@ -45,15 +66,17 @@ namespace PowershellTestProvider
 
         protected override void GetChildItems(string path, bool recurse)
         {
-            TestNode node = GetNode(path);
-            TestNodeList childNodes = node.ChildNodes;
-            if (childNodes != null)
-            {
-                foreach (TestNode childNode in childNodes)
-                {
-                    GetChildNodes(childNode, recurse);
-                }
-            }
+            GetChildNodes(path, recurse, output => output);
+        }
+
+        protected override string GetChildName(string path)
+        {
+            return GetNode(path)?.Name;
+        }
+
+        protected override void GetChildNames(string path, ReturnContainers returnContainers)
+        {
+            GetChildNodes(path, false, output => output.Name);
         }
 
         protected override void GetItem(string path)
@@ -89,6 +112,16 @@ namespace PowershellTestProvider
             return GetNode(path)?.ChildNodes != null;
         }
 
+        protected override string MakePath(string parent, string child)
+        {
+            if (child == null)
+            {
+                return parent;
+            }
+
+            return Path.Combine(parent, child);
+        }
+
         protected override void NewItem(string path, string itemTypeName, object newItemValue)
         {
             TestNode node = rootNode;
@@ -113,8 +146,15 @@ namespace PowershellTestProvider
                 node.Content = newItemValue.ToString();
             }
         }
-
         
+        protected override void RenameItem(string path, string newName)
+        {
+            TestNode node = GetNode(path);
+            if (node != null)
+            {
+                node.Name = newName;
+            }
+        }
 
         protected override Collection<PSDriveInfo> InitializeDefaultDrives()
         {
@@ -127,6 +167,39 @@ namespace PowershellTestProvider
         protected override bool IsValidPath(string path)
         {
             return true;
+        }
+
+        private static void AddTestFiles(IEnumerable testFiles, TestNode parentNode)
+        {
+            if (parentNode.ChildNodes == null)
+            {
+                parentNode.ChildNodes = new TestNodeList(parentNode);
+            }
+
+            foreach (IDictionary testFile in testFiles)
+            {
+                string name = testFile["Name"] as string;
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                TestNode node = new TestNode(name);
+                parentNode.ChildNodes.Add(node);
+                string content = testFile["Content"] as string;
+                if (content != null)
+                {
+                    node.Content = content;
+                }
+                else
+                {
+                    IEnumerable files = testFile["Files"] as IEnumerable;
+                    if (files != null)
+                    {
+                        AddTestFiles(files, node);
+                    }
+                }
+            }
         }
 
         private static IEnumerable<string> GetNodeParts(string path)
@@ -149,21 +222,35 @@ namespace PowershellTestProvider
             return node;
         }
 
-        private void GetChildNodes(TestNode node, bool recurse)
+        private void GetChildNodes(string path, bool recurse, Func<TestNode, object> output)
+        {
+            TestNode node = GetNode(path);
+            TestNodeList childNodes = node.ChildNodes;
+            if (childNodes != null)
+            {
+                TestNodeFilter filter = new TestNodeFilter(Filter, Include, Exclude);
+                foreach (TestNode childNode in childNodes.Where(filter.IsMatch))
+                {
+                    GetChildNodes(childNode, recurse, output, filter);
+                }
+            }
+        }
+
+        private void GetChildNodes(TestNode node, bool recurse, Func<TestNode, object> output, TestNodeFilter filter)
         {
             TestNodeList childNodes = node.ChildNodes;
             if (childNodes == null)
             {
-                WriteItemObject(node, node.FullName, false);
+                WriteItemObject(output(node), node.FullName, false);
             }
             else
             {
-                WriteItemObject(node, node.FullName, true);
+                WriteItemObject(output(node), node.FullName, true);
                 if (recurse)
                 {
-                    foreach (TestNode childNode in childNodes)
+                    foreach (TestNode childNode in childNodes.Where(filter.IsMatch))
                     {
-                        GetChildNodes(childNode, recurse);
+                        GetChildNodes(childNode, recurse, output, filter);
                     }
                 }
             }

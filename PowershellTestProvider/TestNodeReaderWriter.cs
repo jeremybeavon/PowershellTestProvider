@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Management.Automation.Provider;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PowershellTestProvider
 {
@@ -36,13 +33,23 @@ namespace PowershellTestProvider
                 return new string[0];
             }
 
+            isReadComplete = true;
             if (isRaw)
             {
-                isReadComplete = true;
                 return new string[] { node.Content };
             }
 
-            throw new NotSupportedException();
+            List<string> lines = new List<string>();
+            using (StringReader reader = new StringReader(node.Content))
+            {
+                string line = null;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    lines.Add(line);
+                }
+            }
+
+            return lines;
         }
 
         public void Seek(long offset, SeekOrigin origin)

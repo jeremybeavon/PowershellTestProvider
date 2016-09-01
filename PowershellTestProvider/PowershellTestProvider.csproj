@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestNode.cs" />
+    <Compile Include="TestNodeFilter.cs" />
     <Compile Include="TestNodeList.cs" />
     <Compile Include="TestNodeReaderWriter.cs" />
     <Compile Include="TestProvider.cs" />
