@@ -23,7 +23,7 @@ namespace PowershellTestProvider
 
         public bool IsMatch(TestNode node)
         {
-            if (!includePatterns.Any(include => include.IsMatch(node.Name)) ||
+            if (includePatterns.Any(include => !include.IsMatch(node.Name)) ||
                 excludePatterns.Any(exclude => exclude.IsMatch(node.Name)))
             {
                 return false;

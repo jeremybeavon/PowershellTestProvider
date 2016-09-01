@@ -12,5 +12,6 @@
     <files>
         <file src="PowershellTestProvider\bin\Release\PowershellTestProvider.dll" target="PowershellTestProvider.dll" />
         <file src="PowershellTestProviderModule\PowershellTestProviderModule.psd1" target="PowershellTestProviderModule.psd1" />
+        <file src="PowershellTestProviderModule\PowershellTestProviderModule.psm1" target="PowershellTestProviderModule.psm1" />
     </files>
 </package>
