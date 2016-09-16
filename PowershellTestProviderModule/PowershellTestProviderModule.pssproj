@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,7 +12,7 @@
     <CompanyName />
     <Copyright />
     <Description />
-    <Version>0.1.0.0</Version>
+    <Version>0.2.0.0</Version>
     <Guid>ba0a096c-f2d7-4d51-a014-fb06c1b1ee42</Guid>
     <FormatsToProcess />
     <FunctionsToProcess />
@@ -40,9 +40,9 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="PowershellTestProviderModule.psd1" />
-    <Compile Include="PowershellTestProviderModule.psm1" />
-    <Compile Include="PowershellTestProviderModule.tests.ps1" />
+    <Compile Include="PowershellTestProvider.psd1" />
+    <Compile Include="PowershellTestProvider.psm1" />
+    <Compile Include="PowershellTestProvider.tests.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

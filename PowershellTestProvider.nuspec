@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>PowershellTestProvider</id>
-        <version>0.1.0-pre</version>
+        <version>0.2.0-pre</version>
         <authors>Jeremy Beavon</authors>
         <projectUrl>https://github.com/jeremybeavon/PowershellTestProvider</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,7 +11,7 @@
     </metadata>
     <files>
         <file src="PowershellTestProvider\bin\Release\PowershellTestProvider.dll" target="PowershellTestProvider.dll" />
-        <file src="PowershellTestProviderModule\PowershellTestProviderModule.psd1" target="PowershellTestProviderModule.psd1" />
-        <file src="PowershellTestProviderModule\PowershellTestProviderModule.psm1" target="PowershellTestProviderModule.psm1" />
+        <file src="PowershellTestProviderModule\PowershellTestProvider.psd1" target="PowershellTestProvider.psd1" />
+        <file src="PowershellTestProviderModule\PowershellTestProvider.psm1" target="PowershellTestProvider.psm1" />
     </files>
 </package>
